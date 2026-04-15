@@ -1,0 +1,6 @@
+workspace/output/*.html
+workspace/artifacts/*.json
+workspace/artifacts/figures/
+skill/scripts/__pycache__/
+*.pyc
+.DS_Store

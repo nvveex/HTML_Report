@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <style>
+{{INLINE_CSS}}
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <p class="eyebrow">Seiue Usage Report</p>
+      <h1>{{TITLE}}</h1>
+      <p class="hero-meta">数据范围：{{DATE_RANGE}} | 学校识别：{{SCHOOL_NAME}}</p>
+      <p class="hero-note">{{DATA_NOTE}}</p>
+      <div class="hero-summary">
+        <div class="hero-summary-grid">
+          {{TOP_CARDS}}
+        </div>
+      </div>
+    </header>
+    <main>
+      {{BODY_HTML}}
+    </main>
+  </div>
+  <script>
+{{CHART_SCRIPT}}
+  </script>
+</body>
+</html>
