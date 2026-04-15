@@ -29,6 +29,7 @@ def main() -> int:
     args = parser.parse_args()
 
     bundle_root = Path(args.bundle_root).resolve()
+    # Default bundle behavior: always read from <repo-root>/workspace/input unless the user explicitly overrides it.
     workspace_root = Path(args.workspace_root).resolve() if args.workspace_root else bundle_root / "workspace"
     input_dir = Path(args.input_dir).resolve() if args.input_dir else workspace_root / "input"
     output_dir = Path(args.output_dir).resolve() if args.output_dir else workspace_root / "output"

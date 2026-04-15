@@ -1,6 +1,6 @@
 ---
 name: seiue-usage-report
-description: 基于工作区 `workspace/input/` 中的 Seiue/希悦 Excel 文件生成专业型 HTML 学校使用报告。适用于用户从 GitHub 拉取一个 bundle 文件夹后，把 Excel 放入固定输入目录，再通过 Codex 调用 skill 自动生成报告的场景。输出应包含执行摘要、个性化业务分析、问题诊断与行动建议，而不是磁贴式图表汇编。
+description: 基于工作区 `workspace/input/` 中的 Seiue/希悦 Excel 文件生成专业型 HTML 学校使用报告。适用于用户从 GitHub 拉取一个 bundle 文件夹后，把 Excel 放入固定输入目录，再通过 Codex 调用 skill 自动生成报告的场景。输出应包含执行摘要和个性化业务分析，不应采用磁贴式图表汇编；遇到任何不明确之处时，必须先向用户确认，再执行生成。
 ---
 
 # Seiue 使用情况报告
@@ -18,10 +18,12 @@ bundle 应包含以下目录：
 - `workspace/output/`
 - `workspace/artifacts/`
 
-工作时默认以 bundle 根目录为基准：
+工作时默认以仓库根目录为基准。对于本仓库，默认输入目录必须视为 `HTML_Report/workspace/input/`：
 - 输入目录：`workspace/input/`
 - 输出目录：`workspace/output/`
 - 中间产物目录：`workspace/artifacts/`
+
+除非用户明确要求改目录，否则每次都默认根据 `HTML_Report/workspace/input/` 内的数据生成报告。
 
 ## 工作流程
 
@@ -30,6 +32,8 @@ bundle 应包含以下目录：
 3. 在需要时直接生成统一样式的图表，不依赖外部 charts 目录或本地图形库。
 4. 按学校实际数据覆盖情况动态组织报告章节。
 5. 输出专业型 HTML 报告和中间指标 JSON。
+
+如果在学校名称、输出范围、模块取舍、字段解释、结论口径或用户偏好上存在任何不明确之处，必须先向用户确认，完全确认后再执行报告生成。
 
 ## 使用方式
 
@@ -49,7 +53,7 @@ python3 skill/scripts/run_seiue_report.py --bundle-root "$PWD"
 ## 输入输出规则
 
 输入：
-- 默认扫描 `workspace/input/*.xlsx`
+- 默认扫描 `HTML_Report/workspace/input/*.xlsx`
 
 输出：
 - HTML 报告输出到 `workspace/output/`
@@ -67,16 +71,21 @@ python3 skill/scripts/run_seiue_report.py --bundle-root "$PWD"
 
 强制执行项：
 - 结构动态生成，不强制套用统一章节模板
-- 有标题、执行摘要、正文分析、图表或表格、问题诊断、行动建议
+- 有标题、执行摘要、正文分析、图表或表格
 - 每条结论应尽量追溯到具体指标、表格或图表
 - 每个业务章节应体现“判断 + 证据 + 解释 + 管理含义”
-- 问题与建议必须一一对应
 - 不得输出单独的“问题与挑战分析”总章节，模块问题必须直接写在对应模块下
+- 不得输出“下一步管理行动建议”章节
 - 不得使用磁贴式、卡片墙式、仪表盘式布局
 - 主题色固定为蓝白体系
 - 图表固定为统一样式的 canvas 图表
 - 图表配色必须丰富，但整体风格保持专业、现代、克制
 - 图表尺寸必须受正文版心约束，不得超出文档宽度
+- 每个模块必须严格按“标题说明 → 图表 → 分析”三段纵向排列
+- 不得采用图表与分析横向并排布局
+- 图表必须带图例
+- 不得输出“图表由 bundle 内置流程生成”“当前模块未生成图表”等实现性提示文本
+- 允许用户在报告中继续增加个性化内容，渲染结构不得阻碍后续人工增补
 
 ## 图表策略
 
