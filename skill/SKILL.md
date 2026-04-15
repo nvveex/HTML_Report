@@ -7,7 +7,7 @@ description: 基于工作区 `workspace/input/` 中的 Seiue/希悦 Excel 文件
 
 这个 skill 用于处理一个固定结构的分发包。用户从 GitHub 拉取 bundle 后，只需要把 Excel 放进 `workspace/input/`，再调用 `$seiue-usage-report`，就应生成一份专业型 HTML 报告。
 
-这个 skill 不依赖外部项目仓库结构，不要求用户准备 `originaldata/`、`charts/` 或额外图表脚本。
+这个 skill 不依赖外部项目仓库结构，也不再识别 `originaldata/`、`charts/` 或其他外部脚本目录。数据来源只允许是 `workspace/input/` 中的 Excel 文件。
 
 ## 目录约定
 
@@ -32,6 +32,12 @@ bundle 应包含以下目录：
 3. 在需要时直接生成统一样式的图表，不依赖外部 charts 目录或本地图形库。
 4. 按学校实际数据覆盖情况动态组织报告章节。
 5. 输出专业型 HTML 报告和中间指标 JSON。
+
+入口约束：
+- 只扫描 `workspace/input/` 下的 `*.xlsx`
+- 不读取 `originaldata/`
+- 不复用 `charts/`
+- 不依赖项目外部 `scripts/`
 
 如果在学校名称、输出范围、模块取舍、字段解释、结论口径或用户偏好上存在任何不明确之处，必须先向用户确认，完全确认后再执行报告生成。
 

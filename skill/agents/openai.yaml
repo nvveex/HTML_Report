@@ -1,4 +1,4 @@
 interface:
   display_name: "希悦使用报告"
-  short_description: "根据 Excel 与图表生成有证据支撑的 HTML 学校使用报告"
-  default_prompt: "使用 $seiue-usage-report 基于 originaldata 和 charts 生成一份有证据支撑的学校 HTML 使用情况报告。"
+  short_description: "根据 workspace/input 中的 Excel 生成有证据支撑的 HTML 学校使用报告"
+  default_prompt: "使用 $seiue-usage-report 读取当前 bundle 的 workspace/input 中的 Excel 文件，生成一份高度个性化、面向教务管理分析的学校 HTML 使用情况报告。"

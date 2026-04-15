@@ -5,6 +5,11 @@
 1. 把希悦导出的 Excel 文件放进 `workspace/input/`
 2. 在 bundle 根目录调用 `$seiue-usage-report`
 
+说明：
+- skill 只会读取 `workspace/input/` 中的 Excel 文件
+- 不再识别 `originaldata/`
+- 不再依赖 `charts/` 或外部脚本目录
+
 如果需要在本地直接验证，也可以运行：
 
 ```bash
