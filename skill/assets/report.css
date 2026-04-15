@@ -78,10 +78,7 @@ th {
 }
 
 .hero-meta,
-.hero-note,
 .section-intro,
-.small-note,
-.chart-note,
 .muted {
   color: var(--muted);
 }
@@ -197,13 +194,20 @@ main {
 
 .module-article {
   margin-top: 28px;
-  padding: 22px 24px;
-  background: var(--section-bg);
-  border: 1px solid rgba(20, 92, 190, 0.08);
+  padding: 28px 30px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f6faff 100%);
+  border: 1px solid rgba(20, 92, 190, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .module-article:first-child {
   margin-top: 0;
+}
+
+.module-block + .module-block {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(216, 228, 242, 0.92);
 }
 
 .module-header {
@@ -220,14 +224,8 @@ main {
   font-weight: 700;
 }
 
-.module-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: 24px;
-  align-items: start;
-}
-
-.module-text p {
+.module-intro p,
+.module-analysis p {
   margin: 10px 0 0;
 }
 
@@ -236,45 +234,54 @@ main {
   overflow: hidden;
 }
 
+.chart-frame {
+  width: 100%;
+  max-width: 100%;
+  padding: 16px 16px 8px;
+  background: #ffffff;
+  border: 1px solid rgba(20, 92, 190, 0.1);
+}
+
 .report-chart {
   width: 100%;
   max-width: 100%;
   height: auto;
   background: #ffffff;
-  border: 1px solid rgba(20, 92, 190, 0.1);
   display: block;
 }
 
-.module-chart.placeholder {
-  min-height: 180px;
-  padding: 18px;
-  border: 1px dashed rgba(20, 92, 190, 0.2);
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 12px;
+  padding-left: 2px;
+}
+
+.chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: var(--muted);
-  background: #fdfefe;
+  font-size: 13px;
+}
+
+.chart-legend-item i {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  border-radius: 2px;
 }
 
 .module-issue {
   margin-top: 14px;
-  padding: 12px 14px;
-  background: #f3f8ff;
+  padding: 14px 16px;
+  background: #f2f7fd;
   border-left: 3px solid #6ea8ff;
 }
 
-.action-item {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px dashed rgba(20, 92, 190, 0.18);
-}
-
-.action-item:first-child {
+.compact-table {
   margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-}
-
-.owner {
-  color: var(--accent);
-  font-weight: 700;
 }
 
 @media (max-width: 920px) {
@@ -290,12 +297,15 @@ main {
     padding: 0 22px 28px;
   }
 
-  .hero-summary-grid,
-  .module-layout {
+  .hero-summary-grid {
     grid-template-columns: 1fr;
   }
 
   .module-article {
     padding: 18px;
+  }
+
+  .chart-frame {
+    padding: 10px 10px 4px;
   }
 }
