@@ -308,6 +308,15 @@ def build_actions(issues: list[dict[str, str]]) -> list[dict[str, str]]:
     return actions[:6]
 
 
+def attach_issues_to_modules(modules: list[dict[str, Any]], issues: list[dict[str, str]]) -> None:
+    for module in modules:
+        module["embedded_issue"] = None
+        for issue in issues:
+            if module["title"] in issue["title"]:
+                module["embedded_issue"] = issue
+                break
+
+
 def build_summary_bullets(overview: dict[str, Any], modules: list[dict[str, Any]], issues: list[dict[str, str]]) -> list[str]:
     bullets = []
     if overview.get("total_users"):
@@ -389,6 +398,7 @@ def main() -> int:
 
     modules = build_modules(records_map)
     issues = detect_issues(overview, modules)
+    attach_issues_to_modules(modules, issues)
     actions = build_actions(issues)
     summary_bullets = build_summary_bullets(overview, modules, issues)
     metric_cards = build_metric_cards(overview, modules)

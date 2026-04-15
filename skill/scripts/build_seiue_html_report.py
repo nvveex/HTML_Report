@@ -114,15 +114,32 @@ def module_interpretation(module: dict[str, Any]) -> str:
     return "该模块整体较为平稳，说明相关业务流程与平台之间已建立一定的日常协同关系。"
 
 
-def module_implication(module: dict[str, Any]) -> str:
-    if module.get("chart_status") != "available":
-        return "当前模块未形成图表，本段结论主要依据明细数据和聚合统计，解释信心相对保守。"
+def module_issue(module: dict[str, Any]) -> str:
+    issue = module.get("embedded_issue")
+    if issue:
+        return f"""
+        <div class="module-issue">
+          <p><strong>模块问题：</strong>{esc(issue.get("title"))}</p>
+          <p><strong>证据：</strong>{esc(issue.get("evidence"))}</p>
+          <p><strong>管理含义：</strong>{esc(issue.get("implication"))}</p>
+        </div>
+        """
     if module.get("latest_value") is not None and module.get("peak_value") is not None:
         latest = float(module["latest_value"])
         peak = float(module["peak_value"])
         if peak and latest < peak * 0.5:
-            return "近期水平明显低于峰值，需要进一步区分其属于正常学期节奏变化，还是流程执行未形成常态化。"
-    return "当前模块未发现强烈异常，但仍应结合学期节点持续观察其稳定性和覆盖面。"
+            return """
+            <div class="module-issue">
+              <p><strong>模块问题：</strong>近期使用水平低于历史峰值较多。</p>
+              <p><strong>证据：</strong>最近周期仅为峰值的一半以下。</p>
+              <p><strong>管理含义：</strong>需要判断该模块是否仅在阶段性节点使用，尚未形成常态化流程。</p>
+            </div>
+            """
+    return """
+    <div class="module-issue">
+      <p><strong>模块观察：</strong>当前未发现强烈异常，但仍应结合学期节点持续观察其稳定性和覆盖面。</p>
+    </div>
+    """
 
 
 def canvas_chart(module: dict[str, Any]) -> str:
@@ -133,8 +150,8 @@ def canvas_chart(module: dict[str, Any]) -> str:
     canvas_id = f"chart-{abs(hash(module.get('key')))}"
     return f"""
     <div class="module-chart">
-      <canvas id="{canvas_id}" class="report-chart" data-chart='{payload_json}' width="640" height="340"></canvas>
-      <p class="chart-note">图表由 bundle 内置 canvas 图表流程根据 Excel 自动生成，样式在整份报告中保持统一。</p>
+      <canvas id="{canvas_id}" class="report-chart" data-chart='{payload_json}' width="520" height="300"></canvas>
+      <p class="chart-note">图表由 bundle 内置 canvas 图表流程根据 Excel 自动生成，采用统一蓝白主题下的多彩专业配色。</p>
     </div>
     """
 
@@ -151,7 +168,7 @@ def module_article(module: dict[str, Any]) -> str:
         <div class="module-text">
           <ul class="bullet-list">{findings}</ul>
           <p>{esc(module_interpretation(module))}</p>
-          <p class="small-note">{esc(module_implication(module))}</p>
+          {module_issue(module)}
         </div>
         {canvas_chart(module)}
       </div>
@@ -186,31 +203,6 @@ def data_sections(metrics: dict[str, Any]) -> str:
     return "".join(parts)
 
 
-def issues_section(issues: list[dict[str, str]]) -> str:
-    items = "".join(
-        f"""
-        <div class="issue-item">
-          <h3>{esc(issue.get("title"))}</h3>
-          <p><strong>现象：</strong>{esc(issue.get("phenomenon"))}</p>
-          <p><strong>证据：</strong>{esc(issue.get("evidence"))}</p>
-          <p><strong>可能原因：</strong>{esc(issue.get("cause"))}</p>
-          <p class="small-note"><strong>管理含义：</strong>{esc(issue.get("implication"))}</p>
-        </div>
-        """
-        for issue in issues
-    )
-    return f"""
-    <section class="section">
-      <div class="section-head">
-        <p class="eyebrow">Challenges</p>
-        <h2>问题与挑战分析</h2>
-        <p class="section-intro">问题分析重点关注结构失衡、使用断层和节奏波动，不重复铺陈原始数据。</p>
-      </div>
-      {items}
-    </section>
-    """
-
-
 def actions_section(actions: list[dict[str, str]]) -> str:
     items = "".join(
         f"""
@@ -227,7 +219,7 @@ def actions_section(actions: list[dict[str, str]]) -> str:
       <div class="section-head">
         <p class="eyebrow">Action Plan</p>
         <h2>下一步管理行动建议</h2>
-        <p class="section-intro">行动建议与前述问题逐一对应，强调责任主体、目标动作和短周期可执行性。</p>
+        <p class="section-intro">行动建议基于各模块下已识别的问题组织，强调责任主体、目标动作和短周期可执行性。</p>
       </div>
       {items}
     </section>
@@ -237,23 +229,24 @@ def actions_section(actions: list[dict[str, str]]) -> str:
 def chart_script() -> str:
     return """
 (function () {
-  const ink = '#24343b';
-  const axis = '#cfc7b8';
-  const accent = '#2d5a56';
-  const fill = 'rgba(45, 90, 86, 0.12)';
+  const ink = '#1f2f45';
+  const axis = '#d6e2f0';
+  const palette = ['#2f80ed', '#00b8d9', '#5b8ff9', '#36cfc9', '#fa8c16', '#f6bd16', '#7256ff', '#eb2f96'];
+  const lineFill = 'rgba(47, 128, 237, 0.12)';
   document.querySelectorAll('canvas.report-chart').forEach((canvas) => {
     const payload = JSON.parse(canvas.dataset.chart || '{}');
     const ctx = canvas.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
     const cssWidth = canvas.width;
     const cssHeight = canvas.height;
-    canvas.style.width = cssWidth + 'px';
-    canvas.style.height = cssHeight + 'px';
+    canvas.style.width = '100%';
+    canvas.style.maxWidth = cssWidth + 'px';
+    canvas.style.height = 'auto';
     canvas.width = cssWidth * dpr;
     canvas.height = cssHeight * dpr;
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, cssWidth, cssHeight);
-    const left = 54, right = 18, top = 24, bottom = 42;
+    const left = 50, right = 18, top = 24, bottom = 42;
     const plotW = cssWidth - left - right;
     const plotH = cssHeight - top - bottom;
     const values = (payload.values || []).map(Number);
@@ -269,7 +262,7 @@ def chart_script() -> str:
     ctx.lineTo(left, top + plotH);
     ctx.lineTo(left + plotW, top + plotH);
     ctx.stroke();
-    ctx.fillStyle = '#6a7279';
+    ctx.fillStyle = '#69809a';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'right';
     ctx.fillText(String(Math.round(maxV)), left - 8, top + 10);
@@ -282,36 +275,36 @@ def chart_script() -> str:
       });
       ctx.beginPath();
       points.forEach((p, idx) => idx ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
-      ctx.strokeStyle = accent;
+      ctx.strokeStyle = palette[0];
       ctx.lineWidth = 3;
       ctx.stroke();
       ctx.lineTo(points[points.length - 1].x, top + plotH);
       ctx.lineTo(points[0].x, top + plotH);
       ctx.closePath();
-      ctx.fillStyle = fill;
+      ctx.fillStyle = lineFill;
       ctx.fill();
-      ctx.fillStyle = accent;
-      points.forEach((p) => {
+      points.forEach((p, idx) => {
+        ctx.fillStyle = palette[idx % palette.length];
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
         ctx.fill();
       });
-      ctx.fillStyle = '#6a7279';
+      ctx.fillStyle = '#69809a';
       ctx.textAlign = 'left';
       ctx.fillText(labels[0] || '', left, cssHeight - 12);
       ctx.textAlign = 'right';
       ctx.fillText(labels[labels.length - 1] || '', left + plotW, cssHeight - 12);
     } else {
-      const rowH = Math.max(26, Math.min(42, Math.floor(plotH / Math.max(values.length, 1))));
+      const rowH = Math.max(24, Math.min(36, Math.floor(plotH / Math.max(values.length, 1))));
       ctx.font = '12px sans-serif';
       values.forEach((value, index) => {
         const y = top + index * rowH;
         const barW = (value / maxV) * plotW;
-        ctx.fillStyle = accent;
+        ctx.fillStyle = palette[index % palette.length];
         ctx.fillRect(left, y + 6, barW, 16);
         ctx.fillStyle = ink;
         ctx.textAlign = 'right';
-        ctx.fillText((labels[index] || '').slice(0, 18), left - 10, y + 18);
+        ctx.fillText((labels[index] || '').slice(0, 16), left - 10, y + 18);
         ctx.textAlign = 'left';
         ctx.fillText(String(Math.round(value)), left + barW + 8, y + 18);
       });
@@ -330,7 +323,6 @@ def render_html(metrics: dict[str, Any]) -> str:
         [
             summary_section(metrics.get("summary_bullets", [])),
             data_sections(metrics),
-            issues_section(metrics.get("issues", [])),
             actions_section(metrics.get("actions", [])),
         ]
     )
